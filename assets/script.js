@@ -1,6 +1,38 @@
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
+
+//GIVEN I am using a daily planner to create a schedule
+// WHEN I open the planner
+// THEN the current day is displayed at the top of the calendar
+// WHEN I scroll down
+// THEN I am presented with time blocks for standard business hours of 9am to 5pm
+// WHEN I view the time blocks for that day
+// THEN each time block is color-coded to indicate whether it is in the past, present, or future
+// WHEN I click into a time block
+// THEN I can enter an event
+// WHEN I click the save button for that time block
+// THEN the text for that event is saved in local storage
+// WHEN I refresh the page
+// THEN the saved events persist
+//define globals
+const hoursData = [
+  { hour: 9, label: "9AM" },
+  { hour: 10, label: "10AM" },
+  { hour: 11, label: "11AM" },
+  { hour: 12, label: "12PM" },
+  { hour: 13, label: "1PM" },
+  { hour: 14, label: "2PM" },
+  { hour: 15, label: "3PM" },
+  { hour: 16, label: "4PM" },
+  { hour: 17, label: "5PM" }
+];
+
+
+
+
+
+
 $(function () {
   // TODO: Add a listener for click events on the save button. This code should
   // use the id in the containing time-block as a key to save the user input in
