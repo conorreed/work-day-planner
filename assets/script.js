@@ -15,41 +15,97 @@
 // THEN the text for that event is saved in local storage
 // WHEN I refresh the page
 // THEN the saved events persist
+
+// thought some more about this. Probably best not to have the data object. Instead create the rest of the HTML hours
+// and then in the start up function set the appropriate colors and hook up the click events for the icon buttons
+// when clicked just put the test from the textarea into localstorage.
+// Also on start up look in localstorage and if the hour key exists, load that text into textarea.
+// Think this will be much simpler.
 //define globals
-const hoursData = [
-  { hour: 9, label: "9AM" },
-  { hour: 10, label: "10AM" },
-  { hour: 11, label: "11AM" },
-  { hour: 12, label: "12PM" },
-  { hour: 13, label: "1PM" },
-  { hour: 14, label: "2PM" },
-  { hour: 15, label: "3PM" },
-  { hour: 16, label: "4PM" },
-  { hour: 17, label: "5PM" }
-];
 
+function startTimer() {
+  timerInterval = setInterval(function () {
+   colorTheHours();
+  }, 1000 * 60); // every minute
+}
 
+function colorTheHours() {
+  const currentTime = dayjs(); // This gets the current date and time
+  const formattedDate = currentTime.format("YYYY-MM-DD");
+  const formattedTime = currentTime.format("HH:mm:ss");
+  const currentHour = currentTime.hour();
 
+  $("#currentDay").text(formattedDate);
+  $("#currentTime").text(formattedTime);
+
+  $(".container-fluid")
+    .children()
+    .each(function (index, element) {
+      const elementHour = $(element).attr("id");
+      const hourAsNumber = parseInt(elementHour, 10);
+
+      $(element).removeClass("future");
+      $(element).removeClass("past");
+      $(element).removeClass("present");
+
+      if (hourAsNumber < currentHour) {
+        // past
+        $(element).addClass("past");
+      } else if (hourAsNumber > currentHour) {
+        //future
+        $(element).addClass("future");
+      } else if (hourAsNumber === currentHour) {
+        //present
+        $(element).addClass("present");
+      }
+    });
+}
+
+function setupEventHandlers() {
+  const saveButtons = $(".saveBtn");
+
+  // Loop through each element and add a click event handler
+  saveButtons.each(function () {
+    // 'this' refers to the current element in the loop
+    $(this).on("click", function () {
+      // Your click event handling logic here
+      const hourWrapper = $(this).parent(); 
+      const hourWrapperId = hourWrapper.attr("id");
+      const enteredText = $(this).parent().find("textarea").val();
+      localStorage.setItem(hourWrapperId, enteredText);
+    });
+  });
+}
+
+function loadDataFromLocalStorage() {
+  for (let index = 9; index < 17; index++) {
+    const text = localStorage.getItem(index.toString());
+    if (text) {
+      $(`#${index}`).find("textarea").text(text);
+    }
+  }
+
+  const saveButtons = $(".saveBtn");
+
+  // Loop through each element and add a click event handler
+  saveButtons.each(function () {
+    // 'this' refers to the current element in the loop
+    $(this).on("click", function () {
+      // Your click event handling logic here
+      const hourWrapper = $(this).parent(); 
+      const hourWrapperId = hourWrapper.attr("id");
+      const enteredText = $(this).parent().find("textarea").val();
+      localStorage.setItem(hourWrapperId, enteredText);
+    });
+  });
+}
 
 
 
 $(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
+
+  colorTheHours();
+  startTimer();
+  setupEventHandlers();
+  loadDataFromLocalStorage();
 });
